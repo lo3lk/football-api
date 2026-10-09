@@ -3,10 +3,7 @@ package com.example.footballapi.controller;
 import com.example.footballapi.dto.Player;
 import com.example.footballapi.service.PlayerService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,5 +27,11 @@ public class PlayerController {
     @GetMapping("/{id}")
     public Player findById(@PathVariable long id) {
         return playerService.findById(id);
+    }
+
+    @PostMapping
+    public ResponseEntity<Player> createPlayer(@RequestBody Player player) {
+        playerService.insert(player);
+        return ResponseEntity.status(201).body(player);
     }
 }
