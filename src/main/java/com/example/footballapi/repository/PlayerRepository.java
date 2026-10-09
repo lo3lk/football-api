@@ -22,4 +22,8 @@ public class PlayerRepository {
     public Player findById(long id) {
         return playerMapper.findById(id);
     }
+
+    public int insert(Player player) {
+        return playerMapper.insert(player);
+    }
 }

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>サッカー選手管理</title>
+</head>
+<body>
+
+<h1>サッカー選手管理</h1>
+
+<h2>選手一覧</h2>
+<button onclick="getPlayers()">一覧を取得</button>
+
+<h2>選手詳細</h2>
+<input type="number" id="playerId" placeholder="選手ID">
+<button onclick="getPlayer()">詳細を取得</button>
+
+<h2>選手登録</h2>
+<form id="playerForm">
+    <p>選手名：<input type="text" id="name" required></p>
+    <p>背番号：<input type="number" id="number" required></p>
+    <p>ポジション：
+        <select id="position">
+            <option value="GK">GK</option>
+            <option value="DF">DF</option>
+            <option value="MF">MF</option>
+            <option value="FW">FW</option>
+        </select>
+    </p>
+    <p>チーム：<input type="text" id="team" required></p>
+    <p>国籍：<input type="text" id="nationality" required></p>
+    <p>身長：<input type="number" id="height" required></p>
+    <p>体重：<input type="number" id="weight" required></p>
+    <button type="submit">選手を登録</button>
+</form>
+
+<h2>実行結果</h2>
+<pre id="result"></pre>
+
+<script>
+    const url = "/api/players";
+
+    async function getPlayers() {
+        const response = await fetch(url);
+        const data = await response.json();
+        document.getElementById("result").textContent =
+            JSON.stringify(data, null, 2);
+    }
+
+    async function getPlayer() {
+        const id = document.getElementById("playerId").value;
+        const response = await fetch(url + "/" + id);
+        const data = await response.json();
+        document.getElementById("result").textContent =
+            JSON.stringify(data, null, 2);
+    }
+
+    document.getElementById("playerForm").addEventListener("submit",
+        async function (event) {
+            event.preventDefault();
+
+            const player = {
+                name: document.getElementById("name").value,
+                number: Number(document.getElementById("number").value),
+                position: document.getElementById("position").value,
+                team: document.getElementById("team").value,
+                nationality: document.getElementById("nationality").value,
+                height: Number(document.getElementById("height").value),
+                weight: Number(document.getElementById("weight").value)
+            };
+
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(player)
+            });
+
+            const data = await response.json();
+            document.getElementById("result").textContent =
+                JSON.stringify(data, null, 2);
+        }
+    );
+</script>
+
+</body>
+</html>

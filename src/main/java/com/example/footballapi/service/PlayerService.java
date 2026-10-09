@@ -22,4 +22,8 @@ public class PlayerService {
     public Player findById(long id) {
         return playerRepository.findById(id);
     }
+
+    public int insert(Player player) {
+        return playerRepository.insert(player);
+    }
 }
