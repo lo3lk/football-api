@@ -18,4 +18,8 @@ public class PlayerService {
     public List<Player> findAll() {
         return playerRepository.findAll();
     }
+
+    public Player findById(long id) {
+        return playerRepository.findById(id);
+    }
 }

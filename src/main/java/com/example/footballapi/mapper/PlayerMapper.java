@@ -10,10 +10,16 @@ import java.util.List;
 public interface PlayerMapper {
 
     @Select("""
-        
             SELECT id, name, number, position, team, nationality, height, weight
-        FROM players
-        ORDER BY id
-        """)
+            FROM players
+            ORDER BY id
+            """)
     List<Player> findAll();
+
+    @Select("""
+            SELECT id, name, number, position, team, nationality, height, weight
+            FROM players
+            WHERE id = #{id}
+            """)
+    Player findById(long id);
 }
