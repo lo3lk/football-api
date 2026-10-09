@@ -18,4 +18,8 @@ public class PlayerRepository {
     public List<Player> findAll() {
         return playerMapper.findAll();
     }
+
+    public Player findById(long id) {
+        return playerMapper.findById(id);
+    }
 }
