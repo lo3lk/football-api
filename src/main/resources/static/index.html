@@ -2,177 +2,1150 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>サッカー選手管理</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football Manager | 選手管理</title>
+
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #121d30;
+            --panel-light: #18263c;
+            --border: #26364d;
+            --text: #edf4ff;
+            --muted: #93a4bb;
+            --green: #a3e635;
+            --green-dark: #243d20;
+            --danger: #fb7185;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Segoe UI", "Yu Gothic UI", sans-serif;
+            font-size: 14px;
+        }
+
+        button, input, select {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:focus-visible, input:focus-visible, select:focus-visible {
+            outline: 2px solid var(--green);
+            outline-offset: 2px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 225px minmax(0, 1fr);
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            padding: 28px 18px;
+            background: #0e1829;
+            border-right: 1px solid var(--border);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 42px;
+        }
+
+        .brand-icon {
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            background: var(--green);
+            color: #17240b;
+            border-radius: 12px;
+            font-size: 23px;
+            font-weight: 900;
+        }
+
+        .brand-name {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .brand-sub {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .nav-label {
+            margin: 0 10px 12px;
+            color: #70839c;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 7px;
+            padding: 13px 14px;
+            color: #b8c6d9;
+            background: transparent;
+            border: 0;
+            border-radius: 9px;
+            text-align: left;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: var(--green-dark);
+            color: var(--green);
+        }
+
+        .sidebar-note {
+            margin-top: 40px;
+            padding: 15px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .sidebar-note strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .sidebar-note p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        main {
+            min-width: 0;
+            padding: 30px 36px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .eyebrow {
+            margin-bottom: 8px;
+            color: var(--green);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(23px, 3vw, 30px);
+            letter-spacing: -0.7px;
+        }
+
+        .subtitle {
+            margin: 9px 0 0;
+            color: var(--muted);
+        }
+
+        .primary-btn {
+            padding: 12px 17px;
+            background: var(--green);
+            color: #17240b;
+            border: 0;
+            border-radius: 9px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .primary-btn:hover {
+            background: #bef264;
+            transform: translateY(-1px);
+        }
+
+        .secondary-btn {
+            padding: 10px 14px;
+            background: var(--panel-light);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .secondary-btn:hover {
+            border-color: var(--green);
+        }
+
+        .danger-btn {
+            padding: 7px 10px;
+            background: transparent;
+            color: var(--danger);
+            border: 1px solid #65303e;
+            border-radius: 7px;
+        }
+
+        .danger-btn:hover {
+            background: #3c1d2a;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            padding: 20px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .stat-value {
+            margin-top: 12px;
+            font-size: 29px;
+            font-weight: 800;
+        }
+
+        .stat-caption {
+            margin-top: 7px;
+            color: #7e91a9;
+            font-size: 11px;
+        }
+
+        .content-card {
+            overflow: hidden;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 21px 22px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .card-header p {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .search {
+            width: min(260px, 100%);
+            padding: 10px 12px;
+            color: var(--text);
+            background: #0c1627;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap;
+        }
+
+        th {
+            padding: 13px 18px;
+            color: #8ea1b9;
+            background: #101a2b;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: left;
+        }
+
+        td {
+            padding: 16px 18px;
+            border-top: 1px solid #202f44;
+        }
+
+        tbody tr:hover {
+            background: #17253a;
+        }
+
+        .player-name {
+            font-weight: 700;
+        }
+
+        .player-id {
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .number-badge {
+            display: inline-grid;
+            place-items: center;
+            min-width: 32px;
+            height: 32px;
+            padding: 0 7px;
+            background: #263d27;
+            color: var(--green);
+            border-radius: 8px;
+            font-weight: 800;
+        }
+
+        .position-badge {
+            display: inline-block;
+            padding: 5px 9px;
+            color: #c4d4e9;
+            background: #24334a;
+            border-radius: 6px;
+            font-size: 11px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 7px;
+        }
+
+        .small-btn {
+            padding: 7px 10px;
+            color: #d7e4f5;
+            background: #24334a;
+            border: 1px solid #34465e;
+            border-radius: 7px;
+        }
+
+        .small-btn:hover {
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .empty {
+            padding: 38px 20px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .status {
+            display: none;
+            margin-bottom: 18px;
+            padding: 13px 16px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            line-height: 1.6;
+        }
+
+        .status.success {
+            display: block;
+            color: #d9f99d;
+            background: #1c3020;
+            border-color: #365b2d;
+        }
+
+        .status.error {
+            display: block;
+            color: #fecdd3;
+            background: #351c28;
+            border-color: #6b3042;
+        }
+
+        .footer {
+            padding: 20px 0 5px;
+            color: #70839c;
+            font-size: 11px;
+            text-align: center;
+        }
+
+        dialog {
+            width: min(650px, calc(100% - 28px));
+            max-height: 90vh;
+            padding: 0;
+            overflow-y: auto;
+            color: var(--text);
+            background: var(--panel);
+            border: 1px solid #34465e;
+            border-radius: 15px;
+        }
+
+        dialog::backdrop {
+            background: rgb(2 8 18 / 78%);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 22px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 19px;
+        }
+
+        .modal-header p {
+            margin: 7px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .close-btn {
+            width: 34px;
+            height: 34px;
+            color: var(--muted);
+            background: var(--panel-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 18px;
+        }
+
+        .form-body {
+            padding: 24px;
+        }
+
+        .form-section-title {
+            margin: 0 0 17px;
+            color: var(--green);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .field {
+            min-width: 0;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 8px;
+            color: #c5d3e5;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .required {
+            margin-left: 5px;
+            color: var(--green);
+            font-size: 10px;
+        }
+
+        .field input, .field select {
+            width: 100%;
+            min-width: 0;
+            padding: 12px;
+            color: var(--text);
+            background: #0c1627;
+            border: 1px solid #304159;
+            border-radius: 8px;
+        }
+
+        .field input::placeholder {
+            color: #60738d;
+        }
+
+        .field input:focus, .field select:focus {
+            border-color: var(--green);
+            outline: none;
+        }
+
+        .field input.invalid, .field select.invalid {
+            border-color: var(--danger);
+        }
+
+        .hint {
+            margin-top: 6px;
+            color: #8295ad;
+            font-size: 11px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 17px 24px;
+            background: #101a2b;
+            border-top: 1px solid var(--border);
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            padding: 24px;
+        }
+
+        .detail-item {
+            padding: 15px;
+            background: #0c1627;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+        }
+
+        .detail-label {
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                padding: 14px 18px;
+                border-right: 0;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .brand {
+                margin-bottom: 15px;
+            }
+
+            .nav-label, .sidebar-note {
+                display: none;
+            }
+
+            .nav-link {
+                display: inline-flex;
+                width: auto;
+                margin: 0 5px 0 0;
+                padding: 9px 12px;
+            }
+
+            main {
+                padding: 25px 20px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            main {
+                padding: 20px 12px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-value {
+                margin-top: 7px;
+                font-size: 24px;
+            }
+
+            .card-header {
+                align-items: stretch;
+                flex-direction: column;
+                padding: 17px;
+            }
+
+            .search {
+                width: 100%;
+            }
+
+            .form-grid, .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .field.full {
+                grid-column: auto;
+            }
+
+            .form-body {
+                padding: 18px;
+            }
+
+            .modal-header, .modal-footer {
+                padding: 16px 18px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-<h1>サッカー選手管理</h1>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">⚽</div>
+            <div>
+                <div class="brand-name">FOOTBALL MANAGER</div>
+                <div class="brand-sub">PLAYER MANAGEMENT</div>
+            </div>
+        </div>
 
-<h2>選手一覧</h2>
-<button onclick="findAllPlayers()">選手一覧を取得</button>
+        <div class="nav-label">MENU</div>
+        <button class="nav-link active" type="button" onclick="scrollToPlayers()">
+            <span>▦</span> 選手一覧
+        </button>
+        <button class="nav-link" type="button" onclick="openCreateModal()">
+            <span>＋</span> 選手を登録
+        </button>
 
-<hr>
+        <div class="sidebar-note">
+            <strong>⚽ PLAYER DATABASE</strong>
+            <p>選手の基本情報を管理します。登録・編集・詳細確認・削除をこの画面から操作できます。</p>
+        </div>
+    </aside>
 
-<h2>選手詳細</h2>
-<input type="number" id="detailId" placeholder="選手ID">
-<button onclick="findPlayer()">選手詳細を取得</button>
+    <main>
+        <header class="topbar">
+            <div>
+                <div class="eyebrow">TEAM MANAGEMENT / 01</div>
+                <h1>選手管理ダッシュボード</h1>
+                <p class="subtitle">チームの選手情報をまとめて管理しましょう。</p>
+            </div>
+            <button class="primary-btn" type="button" onclick="openCreateModal()">
+                ＋ 選手を追加
+            </button>
+        </header>
 
-<hr>
+        <div id="status" class="status" role="status" aria-live="polite"></div>
 
-<h2>選手登録</h2>
-<form id="createForm">
-    <p>名前：<input type="text" id="createName" required></p>
-    <p>背番号：<input type="number" id="createNumber" required></p>
-    <p>ポジション：<input type="text" id="createPosition" required></p>
-    <p>チーム：<input type="text" id="createTeam" required></p>
-    <p>国籍：<input type="text" id="createNationality" required></p>
-    <p>身長：<input type="number" id="createHeight" required></p>
-    <p>体重：<input type="number" id="createWeight" required></p>
-    <button type="submit">選手を登録</button>
-</form>
+        <section class="stats">
+            <div class="stat-card">
+                <div class="stat-label">登録選手数</div>
+                <div class="stat-value" id="totalPlayers">—</div>
+                <div class="stat-caption">データベースの登録人数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">平均身長</div>
+                <div class="stat-value" id="averageHeight">—</div>
+                <div class="stat-caption">登録選手の平均身長</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">平均体重</div>
+                <div class="stat-value" id="averageWeight">—</div>
+                <div class="stat-caption">登録選手の平均体重</div>
+            </div>
+        </section>
 
-<hr>
+        <section class="content-card" id="playersSection">
+            <div class="card-header">
+                <div>
+                    <h2>選手一覧</h2>
+                    <p>登録されている選手の情報を確認・管理できます。</p>
+                </div>
+                <input
+                        class="search"
+                        id="searchInput"
+                        type="search"
+                        placeholder="名前・チーム・国籍で検索"
+                        aria-label="選手を検索"
+                >
+            </div>
 
-<h2>選手更新</h2>
-<form id="updateForm">
-    <p>選手ID：<input type="number" id="updateId" required></p>
-    <p>名前：<input type="text" id="updateName" required></p>
-    <p>背番号：<input type="number" id="updateNumber" required></p>
-    <p>ポジション：<input type="text" id="updatePosition" required></p>
-    <p>チーム：<input type="text" id="updateTeam" required></p>
-    <p>国籍：<input type="text" id="updateNationality" required></p>
-    <p>身長：<input type="number" id="updateHeight" required></p>
-    <p>体重：<input type="number" id="updateWeight" required></p>
-    <button type="submit">選手を更新</button>
-</form>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ID / 選手名</th>
+                        <th>背番号</th>
+                        <th>ポジション</th>
+                        <th>所属チーム</th>
+                        <th>国籍</th>
+                        <th>身体情報</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="playerTableBody">
+                    <tr>
+                        <td colspan="7" class="empty">選手データを読み込んでいます...</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-<hr>
+        <div class="footer">FOOTBALL MANAGER · SPRING BOOT REST API</div>
+    </main>
+</div>
 
-<h2>選手削除</h2>
-<form id="deleteForm">
-    <p>削除する選手のID：
-        <input type="number" id="deleteId" required>
-    </p>
-    <button type="submit">選手を削除</button>
-</form>
+<!-- 登録・編集共通フォーム -->
+<dialog id="playerDialog">
+    <form id="playerForm">
+        <div class="modal-header">
+            <div>
+                <h2 id="formTitle">選手を登録</h2>
+                <p id="formDescription">選手の基本情報を入力してください。</p>
+            </div>
+            <button class="close-btn" type="button" onclick="closePlayerModal()" aria-label="閉じる">×</button>
+        </div>
 
-<hr>
+        <div class="form-body">
+            <p class="form-section-title">PLAYER INFORMATION</p>
 
-<h2>結果</h2>
-<pre id="result"></pre>
+            <input type="hidden" id="playerId">
+
+            <div class="form-grid">
+                <div class="field full">
+                    <label for="playerName">選手名<span class="required">必須</span></label>
+                    <input id="playerName" type="text" maxlength="100"
+                           placeholder="例：Lionel Messi" required>
+                </div>
+
+                <div class="field">
+                    <label for="playerNumber">背番号<span class="required">必須</span></label>
+                    <input id="playerNumber" type="number" min="0" max="999"
+                           placeholder="例：10" required>
+                </div>
+
+                <div class="field">
+                    <label for="playerPosition">ポジション<span class="required">必須</span></label>
+                    <select id="playerPosition" required>
+                        <option value="">選択してください</option>
+                        <option value="GK">GK</option>
+                        <option value="DF">DF</option>
+                        <option value="MF">MF</option>
+                        <option value="FW">FW</option>
+                    </select>
+                    <div class="hint">GK / DF / MF / FW</div>
+                </div>
+
+                <div class="field full">
+                    <label for="playerTeam">所属チーム<span class="required">必須</span></label>
+                    <input id="playerTeam" type="text" maxlength="100"
+                           placeholder="例：Inter Miami" required>
+                </div>
+
+                <div class="field full">
+                    <label for="playerNationality">国籍<span class="required">必須</span></label>
+                    <input id="playerNationality" type="text" maxlength="100"
+                           placeholder="例：Argentina" required>
+                </div>
+
+                <div class="field">
+                    <label for="playerHeight">身長（cm）<span class="required">必須</span></label>
+                    <input id="playerHeight" type="number" min="1" max="300"
+                           step="0.1" placeholder="例：170" required>
+                </div>
+
+                <div class="field">
+                    <label for="playerWeight">体重（kg）<span class="required">必須</span></label>
+                    <input id="playerWeight" type="number" min="1" max="500"
+                           step="0.1" placeholder="例：72" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="secondary-btn" type="button" onclick="closePlayerModal()">キャンセル</button>
+            <button class="primary-btn" id="submitButton" type="submit">選手を登録</button>
+        </div>
+    </form>
+</dialog>
+
+<!-- 選手詳細 -->
+<dialog id="detailDialog">
+    <div class="modal-header">
+        <div>
+            <h2>選手詳細</h2>
+            <p>選手の登録情報を確認できます。</p>
+        </div>
+        <button class="close-btn" type="button" onclick="detailDialog.close()" aria-label="閉じる">×</button>
+    </div>
+    <div class="detail-grid" id="detailContent"></div>
+    <div class="modal-footer">
+        <button class="secondary-btn" type="button" onclick="detailDialog.close()">閉じる</button>
+    </div>
+</dialog>
 
 <script>
-    // 結果表示用
-    function showResult(data) {
-        document.getElementById("result").textContent =
-            typeof data === "string"
-                ? data
-                : JSON.stringify(data, null, 2);
+    let players = [];
+
+    const playerDialog = document.getElementById("playerDialog");
+    const detailDialog = document.getElementById("detailDialog");
+
+    // 画面にメッセージを表示
+    function showStatus(message, type = "success") {
+        const status = document.getElementById("status");
+        status.textContent = message;
+        status.className = "status " + type;
+        status.scrollIntoView({behavior: "smooth", block: "nearest"});
     }
 
-    // 選手一覧取得
-    async function findAllPlayers() {
-        const response = await fetch("/api/players");
-        const data = await response.json();
-        showResult(data);
+    function clearStatus() {
+        const status = document.getElementById("status");
+        status.textContent = "";
+        status.className = "status";
     }
 
-    // 選手詳細取得
-    async function findPlayer() {
-        const id = document.getElementById("detailId").value;
+    // APIエラーもわかる形で処理
+    async function requestApi(url, options = {}) {
+        const response = await fetch(url, options);
 
-        const response = await fetch("/api/players/" + id);
+        if (!response.ok) {
+            let message = "HTTP " + response.status;
 
-        if (response.ok) {
-            showResult(await response.json());
-        } else {
-            showResult("選手が見つかりません。HTTP " + response.status);
+            try {
+                const text = await response.text();
+                if (text) {
+                    message += "：" + text;
+                }
+            } catch (error) {
+                // エラー本文を取得できない場合はHTTPステータスを表示
+            }
+
+            throw new Error(message);
+        }
+
+        if (response.status === 204) {
+            return null;
+        }
+
+        return response.json();
+    }
+
+    // 選手一覧を取得
+    async function findAllPlayers(showMessage = false) {
+        try {
+            const data = await requestApi("/api/players");
+            players = Array.isArray(data) ? data : [];
+            renderPlayers();
+            updateStats();
+
+            if (showMessage) {
+                showStatus("選手一覧を更新しました。");
+            }
+        } catch (error) {
+            showStatus("選手一覧の取得に失敗しました。 " + error.message, "error");
+            document.getElementById("playerTableBody").innerHTML =
+                '<tr><td colspan="7" class="empty">データを取得できませんでした。サーバーの状態を確認してください。</td></tr>';
         }
     }
 
-    // 選手登録
-    document.getElementById("createForm").addEventListener("submit", async function (event) {
-        event.preventDefault();
+    // HTMLに表示する文字列を安全に処理
+    function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, function (char) {
+            return {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            }[char];
+        });
+    }
 
-        const player = {
-            name: document.getElementById("createName").value,
-            number: Number(document.getElementById("createNumber").value),
-            position: document.getElementById("createPosition").value,
-            team: document.getElementById("createTeam").value,
-            nationality: document.getElementById("createNationality").value,
-            height: Number(document.getElementById("createHeight").value),
-            weight: Number(document.getElementById("createWeight").value)
-        };
+    // 選手一覧を表示
+    function renderPlayers() {
+        const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
 
-        const response = await fetch("/api/players", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(player)
+        const filteredPlayers = players.filter(function (player) {
+            const searchText = [
+                player.name,
+                player.team,
+                player.nationality,
+                player.position
+            ].join(" ").toLowerCase();
+
+            return searchText.includes(keyword);
         });
 
-        if (response.ok) {
-            showResult(await response.json());
-        } else {
-            showResult("選手登録に失敗しました。HTTP " + response.status);
-        }
-    });
+        const tbody = document.getElementById("playerTableBody");
 
-    // 選手更新
-    document.getElementById("updateForm").addEventListener("submit", async function (event) {
-        event.preventDefault();
-
-        const id = document.getElementById("updateId").value;
-
-        const player = {
-            name: document.getElementById("updateName").value,
-            number: Number(document.getElementById("updateNumber").value),
-            position: document.getElementById("updatePosition").value,
-            team: document.getElementById("updateTeam").value,
-            nationality: document.getElementById("updateNationality").value,
-            height: Number(document.getElementById("updateHeight").value),
-            weight: Number(document.getElementById("updateWeight").value)
-        };
-
-        const response = await fetch("/api/players/" + id, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(player)
-        });
-
-        if (response.ok) {
-            showResult(await response.json());
-        } else if (response.status === 404) {
-            showResult("更新する選手が見つかりません。");
-        } else {
-            showResult("選手更新に失敗しました。HTTP " + response.status);
-        }
-    });
-
-    // 選手削除
-    document.getElementById("deleteForm").addEventListener("submit", async function (event) {
-        event.preventDefault();
-
-        const id = document.getElementById("deleteId").value;
-
-        if (!confirm("ID " + id + " の選手を削除しますか？")) {
+        if (filteredPlayers.length === 0) {
+            tbody.innerHTML =
+                '<tr><td colspan="7" class="empty">該当する選手がいません。</td></tr>';
             return;
         }
 
-        const response = await fetch("/api/players/" + id, {
-            method: "DELETE"
-        });
+        tbody.innerHTML = filteredPlayers.map(function (player) {
+            return `
+                <tr>
+                    <td>
+                        <div class="player-name">${escapeHtml(player.name)}</div>
+                        <div class="player-id">ID: ${escapeHtml(player.id)}</div>
+                    </td>
+                    <td><span class="number-badge">${escapeHtml(player.number)}</span></td>
+                    <td><span class="position-badge">${escapeHtml(player.position)}</span></td>
+                    <td>${escapeHtml(player.team)}</td>
+                    <td>${escapeHtml(player.nationality)}</td>
+                    <td>${escapeHtml(player.height)} cm / ${escapeHtml(player.weight)} kg</td>
+                    <td>
+                        <div class="actions">
+                            <button class="small-btn" type="button"
+                                onclick="showPlayerDetail(${Number(player.id)})">詳細</button>
+                            <button class="small-btn" type="button"
+                                onclick="openEditModal(${Number(player.id)})">編集</button>
+                            <button class="danger-btn" type="button"
+                                onclick="deletePlayer(${Number(player.id)})">削除</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join("");
+    }
 
-        if (response.status === 204) {
-            showResult("選手を削除しました。ID：" + id);
-        } else if (response.status === 404) {
-            showResult("削除する選手が見つかりません。");
-        } else {
-            showResult("選手削除に失敗しました。HTTP " + response.status);
+    // 統計カードを更新
+    function updateStats() {
+        document.getElementById("totalPlayers").textContent = players.length;
+
+        if (players.length === 0) {
+            document.getElementById("averageHeight").textContent = "—";
+            document.getElementById("averageWeight").textContent = "—";
+            return;
+        }
+
+        const averageHeight = players.reduce(function (sum, player) {
+            return sum + Number(player.height || 0);
+        }, 0) / players.length;
+
+        const averageWeight = players.reduce(function (sum, player) {
+            return sum + Number(player.weight || 0);
+        }, 0) / players.length;
+
+        document.getElementById("averageHeight").textContent =
+            averageHeight.toFixed(1) + " cm";
+
+        document.getElementById("averageWeight").textContent =
+            averageWeight.toFixed(1) + " kg";
+    }
+
+    // 選手登録フォームを開く
+    function openCreateModal() {
+        clearStatus();
+        document.getElementById("playerForm").reset();
+        document.getElementById("playerId").value = "";
+        document.getElementById("formTitle").textContent = "選手を登録";
+        document.getElementById("formDescription").textContent =
+            "新しい選手の基本情報を入力してください。";
+        document.getElementById("submitButton").textContent = "選手を登録";
+        clearInvalidFields();
+        playerDialog.showModal();
+    }
+
+    // 選手編集フォームを開く
+    async function openEditModal(id) {
+        clearStatus();
+
+        try {
+            const player = await requestApi("/api/players/" + id);
+            fillPlayerForm(player);
+
+            document.getElementById("formTitle").textContent = "選手情報を編集";
+            document.getElementById("formDescription").textContent =
+                "選手情報を変更して保存してください。";
+            document.getElementById("submitButton").textContent = "変更を保存";
+
+            playerDialog.showModal();
+        } catch (error) {
+            showStatus("選手情報を取得できませんでした。 " + error.message, "error");
+        }
+    }
+
+    function fillPlayerForm(player) {
+        document.getElementById("playerId").value = player.id;
+        document.getElementById("playerName").value = player.name ?? "";
+        document.getElementById("playerNumber").value = player.number ?? "";
+        document.getElementById("playerPosition").value = player.position ?? "";
+        document.getElementById("playerTeam").value = player.team ?? "";
+        document.getElementById("playerNationality").value = player.nationality ?? "";
+        document.getElementById("playerHeight").value = player.height ?? "";
+        document.getElementById("playerWeight").value = player.weight ?? "";
+        clearInvalidFields();
+    }
+
+    function closePlayerModal() {
+        playerDialog.close();
+    }
+
+    function clearInvalidFields() {
+        document.querySelectorAll("#playerForm .invalid").forEach(function (field) {
+            field.classList.remove("invalid");
+        });
+    }
+
+    // 登録・更新のフォーム送信
+    document.getElementById("playerForm").addEventListener("submit", async function (event) {
+        event.preventDefault();
+        clearStatus();
+        clearInvalidFields();
+
+        const form = event.currentTarget;
+
+        if (!form.checkValidity()) {
+            form.querySelectorAll("input, select").forEach(function (field) {
+                if (field.type !== "hidden" && !field.checkValidity()) {
+                    field.classList.add("invalid");
+                }
+            });
+
+            form.reportValidity();
+            return;
+        }
+
+        const id = document.getElementById("playerId").value;
+
+        const player = {
+            name: document.getElementById("playerName").value.trim(),
+            number: Number(document.getElementById("playerNumber").value),
+            position: document.getElementById("playerPosition").value,
+            team: document.getElementById("playerTeam").value.trim(),
+            nationality: document.getElementById("playerNationality").value.trim(),
+            height: Number(document.getElementById("playerHeight").value),
+            weight: Number(document.getElementById("playerWeight").value)
+        };
+
+        // 空白だけの入力を防ぐ
+        if (!player.name || !player.team || !player.nationality) {
+            showStatus("選手名・所属チーム・国籍を入力してください。", "error");
+            return;
+        }
+
+        const isEdit = id !== "";
+        const submitButton = document.getElementById("submitButton");
+
+        submitButton.disabled = true;
+        submitButton.textContent = "保存中...";
+
+        try {
+            await requestApi(isEdit ? "/api/players/" + id : "/api/players", {
+                method: isEdit ? "PUT" : "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(player)
+            });
+
+            closePlayerModal();
+            await findAllPlayers(false);
+            showStatus(isEdit ? "選手情報を更新しました。" : "選手を登録しました。");
+        } catch (error) {
+            showStatus(
+                (isEdit ? "選手の更新" : "選手の登録") + "に失敗しました。 " + error.message,
+                "error"
+            );
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = isEdit ? "変更を保存" : "選手を登録";
         }
     });
+
+    // 選手詳細を表示
+    async function showPlayerDetail(id) {
+        clearStatus();
+
+        try {
+            const player = await requestApi("/api/players/" + id);
+
+            const details = [
+                ["選手ID", player.id],
+                ["選手名", player.name],
+                ["背番号", player.number],
+                ["ポジション", player.position],
+                ["所属チーム", player.team],
+                ["国籍", player.nationality],
+                ["身長", player.height + " cm"],
+                ["体重", player.weight + " kg"]
+            ];
+
+            document.getElementById("detailContent").innerHTML =
+                details.map(function (item) {
+                    return `
+                        <div class="detail-item">
+                            <div class="detail-label">${escapeHtml(item[0])}</div>
+                            <div class="detail-value">${escapeHtml(item[1])}</div>
+                        </div>
+                    `;
+                }).join("");
+
+            detailDialog.showModal();
+        } catch (error) {
+            showStatus("選手詳細を取得できませんでした。 " + error.message, "error");
+        }
+    }
+
+    // 選手を削除
+    async function deletePlayer(id) {
+        const player = players.find(function (item) {
+            return Number(item.id) === Number(id);
+        });
+
+        const name = player ? player.name : "ID " + id;
+
+        if (!confirm("「" + name + "」を削除しますか？\nこの操作は取り消せません。")) {
+            return;
+        }
+
+        clearStatus();
+
+        try {
+            await requestApi("/api/players/" + id, {
+                method: "DELETE"
+            });
+
+            await findAllPlayers(false);
+            showStatus("選手を削除しました。 " + name);
+        } catch (error) {
+            showStatus("選手の削除に失敗しました。 " + error.message, "error");
+        }
+    }
+
+    function scrollToPlayers() {
+        document.getElementById("playersSection").scrollIntoView({
+            behavior: "smooth"
+        });
+    }
+
+    document.getElementById("searchInput").addEventListener("input", renderPlayers);
+
+    // 画面を開いたら選手一覧を自動取得
+    findAllPlayers();
 </script>
 </body>
 </html>
