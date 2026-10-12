@@ -13,4 +13,5 @@ public class Player {
     private String nationality;
     private double height;
     private double weight;
+    private String imagePath;
 }
