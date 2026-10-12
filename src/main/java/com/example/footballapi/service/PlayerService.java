@@ -26,4 +26,8 @@ public class PlayerService {
     public int insert(Player player) {
         return playerRepository.insert(player);
     }
+
+    public int update(Player player) {
+        return playerRepository.update(player);
+    }
 }

@@ -1,10 +1,7 @@
 package com.example.footballapi.mapper;
 
 import com.example.footballapi.dto.Player;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -33,4 +30,17 @@ public interface PlayerMapper {
             """)
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(Player player);
+
+    @Update("""
+            UPDATE players
+            SET name = #{name},
+                number = #{number},
+                position = #{position},
+                team = #{team},
+                nationality = #{nationality},
+                height = #{height},
+                weight = #{weight}
+            WHERE id = #{id}
+            """)
+    int update(Player player);
 }

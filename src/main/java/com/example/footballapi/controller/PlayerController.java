@@ -34,4 +34,20 @@ public class PlayerController {
         playerService.insert(player);
         return ResponseEntity.status(201).body(player);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Player> updatePlayer(
+            @PathVariable long id,
+            @RequestBody Player player) {
+
+        player.setId(id);
+
+        int result = playerService.update(player);
+
+        if (result == 0) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(player);
+    }
 }

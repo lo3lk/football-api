@@ -26,4 +26,8 @@ public class PlayerRepository {
     public int insert(Player player) {
         return playerMapper.insert(player);
     }
+
+    public int update(Player player) {
+        return playerMapper.update(player);
+    }
 }
