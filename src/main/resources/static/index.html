@@ -34,6 +34,50 @@
     <button type="submit">選手を登録</button>
 </form>
 
+<h2>選手更新</h2>
+
+<form id="updateForm">
+    <label>更新する選手のID：</label>
+    <input type="number" id="updateId" required>
+    <br><br>
+
+    <label>名前：</label>
+    <input type="text" id="updateName" required>
+    <br><br>
+
+    <label>背番号：</label>
+    <input type="number" id="updateNumber" required>
+    <br><br>
+
+    <label>ポジション：</label>
+    <select id="updatePosition" required>
+        <option value="GK">GK</option>
+        <option value="DF">DF</option>
+        <option value="MF">MF</option>
+        <option value="FW">FW</option>
+    </select>
+    <br><br>
+
+    <label>チーム：</label>
+    <input type="text" id="updateTeam" required>
+    <br><br>
+
+    <label>国籍：</label>
+    <input type="text" id="updateNationality" required>
+    <br><br>
+
+    <label>身長：</label>
+    <input type="number" id="updateHeight" required>
+    <br><br>
+
+    <label>体重：</label>
+    <input type="number" id="updateWeight" required>
+    <br><br>
+
+    <button type="submit">選手を更新</button>
+</form>
+
+
 <h2>実行結果</h2>
 <pre id="result"></pre>
 
@@ -82,6 +126,42 @@
                 JSON.stringify(data, null, 2);
         }
     );
+
+    document.getElementById("updateForm").addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const id = document.getElementById("updateId").value;
+
+        const player = {
+            name: document.getElementById("updateName").value,
+            number: Number(document.getElementById("updateNumber").value),
+            position: document.getElementById("updatePosition").value,
+            team: document.getElementById("updateTeam").value,
+            nationality: document.getElementById("updateNationality").value,
+            height: Number(document.getElementById("updateHeight").value),
+            weight: Number(document.getElementById("updateWeight").value)
+        };
+
+        const response = await fetch("/api/players/" + id, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(player)
+        });
+
+        const result = document.getElementById("result");
+
+        if (response.ok) {
+            const data = await response.json();
+            result.textContent = "選手を更新しました\n" + JSON.stringify(data, null, 2);
+        } else if (response.status === 404) {
+            result.textContent = "指定したIDの選手が見つかりません";
+        } else {
+            result.textContent = "更新に失敗しました：" + response.status;
+        }
+    });
+
 </script>
 
 </body>
