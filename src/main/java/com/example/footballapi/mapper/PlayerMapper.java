@@ -43,4 +43,11 @@ public interface PlayerMapper {
             WHERE id = #{id}
             """)
     int update(Player player);
+
+    @Delete("""
+        
+            DELETE FROM players
+        WHERE id = #{id}
+        """)
+    int deleteById(long id);
 }

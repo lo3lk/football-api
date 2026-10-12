@@ -30,4 +30,8 @@ public class PlayerRepository {
     public int update(Player player) {
         return playerMapper.update(player);
     }
+
+    public int deleteById(long id) {
+        return playerMapper.deleteById(id);
+    }
 }

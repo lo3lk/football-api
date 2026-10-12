@@ -50,4 +50,15 @@ public class PlayerController {
 
         return ResponseEntity.ok(player);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePlayer(@PathVariable long id) {
+        int result = playerService.deleteById(id);
+
+        if (result == 0) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.noContent().build();
+    }
 }

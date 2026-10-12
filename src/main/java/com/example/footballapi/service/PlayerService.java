@@ -30,4 +30,8 @@ public class PlayerService {
     public int update(Player player) {
         return playerRepository.update(player);
     }
+
+    public int deleteById(long id) {
+        return playerRepository.deleteById(id);
+    }
 }
