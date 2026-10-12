@@ -31,6 +31,17 @@ public class PlayerService {
         return playerRepository.update(player);
     }
 
+    public int updateImagePath(long id, String imagePath) {
+        Player player = playerRepository.findById(id);
+
+        if (player == null) {
+            return 0;
+        }
+
+        player.setImagePath(imagePath);
+        return playerRepository.update(player);
+    }
+
     public int deleteById(long id) {
         return playerRepository.deleteById(id);
     }

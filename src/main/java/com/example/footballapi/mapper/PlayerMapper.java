@@ -9,14 +9,16 @@ import java.util.List;
 public interface PlayerMapper {
 
     @Select("""
-            SELECT id, name, number, position, team, nationality, height, weight
+            SELECT id, name, number, position, team, nationality,
+                   height, weight, image_path
             FROM players
             ORDER BY id
             """)
     List<Player> findAll();
 
     @Select("""
-            SELECT id, name, number, position, team, nationality, height, weight
+            SELECT id, name, number, position, team, nationality,
+                   height, weight, image_path
             FROM players
             WHERE id = #{id}
             """)
@@ -24,9 +26,11 @@ public interface PlayerMapper {
 
     @Insert("""
             INSERT INTO players
-            (name, number, position, team, nationality, height, weight)
+            (name, number, position, team, nationality,
+             height, weight, image_path)
             VALUES
-            (#{name}, #{number}, #{position}, #{team}, #{nationality}, #{height}, #{weight})
+            (#{name}, #{number}, #{position}, #{team}, #{nationality},
+             #{height}, #{weight}, #{imagePath})
             """)
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(Player player);
@@ -39,15 +43,15 @@ public interface PlayerMapper {
                 team = #{team},
                 nationality = #{nationality},
                 height = #{height},
-                weight = #{weight}
+                weight = #{weight},
+                image_path = COALESCE(#{imagePath}, image_path)
             WHERE id = #{id}
             """)
     int update(Player player);
 
     @Delete("""
-        
             DELETE FROM players
-        WHERE id = #{id}
-        """)
+            WHERE id = #{id}
+            """)
     int deleteById(long id);
 }

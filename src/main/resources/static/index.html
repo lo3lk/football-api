@@ -616,6 +616,71 @@
                 padding: 16px 18px;
             }
         }
+
+        /* 選手画像 */
+        .player-photo-cell {
+            min-width: 150px;
+        }
+
+        .player-photo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .player-photo {
+            width: 64px;
+            height: 64px;
+            flex-shrink: 0;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: #f1f5f9;
+        }
+
+        .player-photo-placeholder {
+            width: 64px;
+            height: 64px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: #e2e8f0;
+            color: #64748b;
+            font-size: 24px;
+        }
+
+        .player-photo-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .image-upload-btn {
+            padding: 6px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            background: #fff;
+            color: #334155;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .image-upload-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .image-upload-btn:disabled {
+            opacity: 0.5;
+            cursor: wait;
+        }
+
+        .image-upload-input {
+            display: none;
+        }
+
     </style>
 </head>
 
@@ -695,6 +760,7 @@
                 <table>
                     <thead>
                     <tr>
+                        <th>画像</th>
                         <th>ID / 選手名</th>
                         <th>背番号</th>
                         <th>ポジション</th>
@@ -706,7 +772,7 @@
                     </thead>
                     <tbody id="playerTableBody">
                     <tr>
-                        <td colspan="7" class="empty">選手データを読み込んでいます...</td>
+                        <td colspan="8" class="empty">選手データを読み込んでいます...</td>
                     </tr>
                     </tbody>
                 </table>
@@ -866,7 +932,7 @@
         } catch (error) {
             showStatus("選手一覧の取得に失敗しました。 " + error.message, "error");
             document.getElementById("playerTableBody").innerHTML =
-                '<tr><td colspan="7" class="empty">データを取得できませんでした。サーバーの状態を確認してください。</td></tr>';
+                '<tr><td colspan="8" class="empty">データを取得できませんでした。サーバーの状態を確認してください。</td></tr>';
         }
     }
 
@@ -884,8 +950,12 @@
     }
 
     // 選手一覧を表示
+
     function renderPlayers() {
-        const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+        const keyword = document
+            .getElementById("searchInput")
+            .value.trim()
+            .toLowerCase();
 
         const filteredPlayers = players.filter(function (player) {
             const searchText = [
@@ -902,36 +972,83 @@
 
         if (filteredPlayers.length === 0) {
             tbody.innerHTML =
-                '<tr><td colspan="7" class="empty">該当する選手がいません。</td></tr>';
+                '<tr><td colspan="8" class="empty">該当する選手がいません。</td></tr>';
             return;
         }
 
         tbody.innerHTML = filteredPlayers.map(function (player) {
+            const id = Number(player.id);
+            const imagePath = player.imagePath
+                ? escapeHtml(player.imagePath)
+                : "";
+
+            const photo = imagePath
+                ? `<img class="player-photo"
+                    src="${imagePath}"
+                    alt="${escapeHtml(player.name)}の画像"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+               <div class="player-photo-placeholder" style="display:none;">⚽</div>`
+                : '<div class="player-photo-placeholder">⚽</div>';
+
             return `
-                <tr>
-                    <td>
-                        <div class="player-name">${escapeHtml(player.name)}</div>
-                        <div class="player-id">ID: ${escapeHtml(player.id)}</div>
-                    </td>
-                    <td><span class="number-badge">${escapeHtml(player.number)}</span></td>
-                    <td><span class="position-badge">${escapeHtml(player.position)}</span></td>
-                    <td>${escapeHtml(player.team)}</td>
-                    <td>${escapeHtml(player.nationality)}</td>
-                    <td>${escapeHtml(player.height)} cm / ${escapeHtml(player.weight)} kg</td>
-                    <td>
-                        <div class="actions">
-                            <button class="small-btn" type="button"
-                                onclick="showPlayerDetail(${Number(player.id)})">詳細</button>
-                            <button class="small-btn" type="button"
-                                onclick="openEditModal(${Number(player.id)})">編集</button>
-                            <button class="danger-btn" type="button"
-                                onclick="deletePlayer(${Number(player.id)})">削除</button>
+            <tr>
+                <td class="player-photo-cell">
+                    <div class="player-photo-area">
+                        <div>
+                            ${photo}
                         </div>
-                    </td>
-                </tr>
-            `;
+                        <div class="player-photo-actions">
+                            <input
+                                class="image-upload-input"
+                                type="file"
+                                id="imageFile-${id}"
+                                accept="image/jpeg,image/png,image/webp"
+                                onchange="uploadPlayerImage(${id}, this)"
+                            >
+                            <button
+                                class="image-upload-btn"
+                                type="button"
+                                id="imageButton-${id}"
+                                onclick="document.getElementById('imageFile-${id}').click()"
+                            >
+                                ${imagePath ? "画像を変更" : "画像を追加"}
+                            </button>
+                        </div>
+                    </div>
+                </td>
+
+                <td>
+                    <div class="player-name">${escapeHtml(player.name)}</div>
+                    <div class="player-id">ID: ${escapeHtml(player.id)}</div>
+                </td>
+
+                <td>
+                    <span class="number-badge">${escapeHtml(player.number)}</span>
+                </td>
+
+                <td>
+                    <span class="position-badge">${escapeHtml(player.position)}</span>
+                </td>
+
+                <td>${escapeHtml(player.team)}</td>
+                <td>${escapeHtml(player.nationality)}</td>
+                <td>${escapeHtml(player.height)} cm / ${escapeHtml(player.weight)} kg</td>
+
+                <td>
+                    <div class="actions">
+                        <button class="small-btn" type="button"
+                            onclick="showPlayerDetail(${id})">詳細</button>
+                        <button class="small-btn" type="button"
+                            onclick="openEditModal(${id})">編集</button>
+                        <button class="danger-btn" type="button"
+                            onclick="deletePlayer(${id})">削除</button>
+                    </div>
+                </td>
+            </tr>
+        `;
         }).join("");
     }
+
 
     // 統計カードを更新
     function updateStats() {
@@ -1133,6 +1250,101 @@
             showStatus("選手を削除しました。 " + name);
         } catch (error) {
             showStatus("選手の削除に失敗しました。 " + error.message, "error");
+        }
+    }
+    async function uploadPlayerImage(id, input) {
+        const file = input.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        const button = document.getElementById("imageButton-" + id);
+
+        if (file.size > 5 * 1024 * 1024) {
+            showStatus("画像は5MB以下にしてください。", "error");
+            input.value = "";
+            return;
+        }
+
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+            showStatus(
+                "JPEG・PNG・WebP形式の画像を選択してください。",
+                "error"
+            );
+            input.value = "";
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        button.disabled = true;
+        button.textContent = "アップロード中...";
+        clearStatus();
+
+        try {
+            const updatedPlayer = await requestApi(
+                "/api/players/" + id + "/image",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+            const index = players.findIndex(function (player) {
+                return Number(player.id) === Number(id);
+            });
+
+            if (index !== -1) {
+                players[index] = updatedPlayer;
+            }
+
+            // ファイル選択欄を空にしてから再描画
+            input.value = "";
+
+            // 最新の選手情報を使って画像を即時反映
+            renderPlayers();
+            updateStats();
+
+            showStatus("選手画像をアップロードしました。");
+
+        } catch (error) {
+            showStatus(
+                "画像のアップロードに失敗しました。 " + error.message,
+                "error"
+            );
+
+        } finally {
+            // 再描画後のボタンを取得する
+            const currentButton =
+                document.getElementById("imageButton-" + id);
+
+            if (currentButton) {
+                currentButton.disabled = false;
+
+                const player = players.find(function (item) {
+                    return Number(item.id) === Number(id);
+                });
+
+                currentButton.textContent =
+                    player && player.imagePath
+                        ? "画像を変更"
+                        : "画像を追加";
+            }
+
+            const currentInput =
+                document.getElementById("imageFile-" + id);
+
+            if (currentInput) {
+                currentInput.value = "";
+            }
         }
     }
 
