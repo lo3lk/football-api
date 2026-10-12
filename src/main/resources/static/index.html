@@ -5,128 +5,120 @@
     <title>サッカー選手管理</title>
 </head>
 <body>
-
 <h1>サッカー選手管理</h1>
 
 <h2>選手一覧</h2>
-<button onclick="getPlayers()">一覧を取得</button>
+<button onclick="findAllPlayers()">選手一覧を取得</button>
+
+<hr>
 
 <h2>選手詳細</h2>
-<input type="number" id="playerId" placeholder="選手ID">
-<button onclick="getPlayer()">詳細を取得</button>
+<input type="number" id="detailId" placeholder="選手ID">
+<button onclick="findPlayer()">選手詳細を取得</button>
+
+<hr>
 
 <h2>選手登録</h2>
-<form id="playerForm">
-    <p>選手名：<input type="text" id="name" required></p>
-    <p>背番号：<input type="number" id="number" required></p>
-    <p>ポジション：
-        <select id="position">
-            <option value="GK">GK</option>
-            <option value="DF">DF</option>
-            <option value="MF">MF</option>
-            <option value="FW">FW</option>
-        </select>
-    </p>
-    <p>チーム：<input type="text" id="team" required></p>
-    <p>国籍：<input type="text" id="nationality" required></p>
-    <p>身長：<input type="number" id="height" required></p>
-    <p>体重：<input type="number" id="weight" required></p>
+<form id="createForm">
+    <p>名前：<input type="text" id="createName" required></p>
+    <p>背番号：<input type="number" id="createNumber" required></p>
+    <p>ポジション：<input type="text" id="createPosition" required></p>
+    <p>チーム：<input type="text" id="createTeam" required></p>
+    <p>国籍：<input type="text" id="createNationality" required></p>
+    <p>身長：<input type="number" id="createHeight" required></p>
+    <p>体重：<input type="number" id="createWeight" required></p>
     <button type="submit">選手を登録</button>
 </form>
 
+<hr>
+
 <h2>選手更新</h2>
-
 <form id="updateForm">
-    <label>更新する選手のID：</label>
-    <input type="number" id="updateId" required>
-    <br><br>
-
-    <label>名前：</label>
-    <input type="text" id="updateName" required>
-    <br><br>
-
-    <label>背番号：</label>
-    <input type="number" id="updateNumber" required>
-    <br><br>
-
-    <label>ポジション：</label>
-    <select id="updatePosition" required>
-        <option value="GK">GK</option>
-        <option value="DF">DF</option>
-        <option value="MF">MF</option>
-        <option value="FW">FW</option>
-    </select>
-    <br><br>
-
-    <label>チーム：</label>
-    <input type="text" id="updateTeam" required>
-    <br><br>
-
-    <label>国籍：</label>
-    <input type="text" id="updateNationality" required>
-    <br><br>
-
-    <label>身長：</label>
-    <input type="number" id="updateHeight" required>
-    <br><br>
-
-    <label>体重：</label>
-    <input type="number" id="updateWeight" required>
-    <br><br>
-
+    <p>選手ID：<input type="number" id="updateId" required></p>
+    <p>名前：<input type="text" id="updateName" required></p>
+    <p>背番号：<input type="number" id="updateNumber" required></p>
+    <p>ポジション：<input type="text" id="updatePosition" required></p>
+    <p>チーム：<input type="text" id="updateTeam" required></p>
+    <p>国籍：<input type="text" id="updateNationality" required></p>
+    <p>身長：<input type="number" id="updateHeight" required></p>
+    <p>体重：<input type="number" id="updateWeight" required></p>
     <button type="submit">選手を更新</button>
 </form>
 
+<hr>
 
-<h2>実行結果</h2>
+<h2>選手削除</h2>
+<form id="deleteForm">
+    <p>削除する選手のID：
+        <input type="number" id="deleteId" required>
+    </p>
+    <button type="submit">選手を削除</button>
+</form>
+
+<hr>
+
+<h2>結果</h2>
 <pre id="result"></pre>
 
 <script>
-    const url = "/api/players";
-
-    async function getPlayers() {
-        const response = await fetch(url);
-        const data = await response.json();
+    // 結果表示用
+    function showResult(data) {
         document.getElementById("result").textContent =
-            JSON.stringify(data, null, 2);
+            typeof data === "string"
+                ? data
+                : JSON.stringify(data, null, 2);
     }
 
-    async function getPlayer() {
-        const id = document.getElementById("playerId").value;
-        const response = await fetch(url + "/" + id);
+    // 選手一覧取得
+    async function findAllPlayers() {
+        const response = await fetch("/api/players");
         const data = await response.json();
-        document.getElementById("result").textContent =
-            JSON.stringify(data, null, 2);
+        showResult(data);
     }
 
-    document.getElementById("playerForm").addEventListener("submit",
-        async function (event) {
-            event.preventDefault();
+    // 選手詳細取得
+    async function findPlayer() {
+        const id = document.getElementById("detailId").value;
 
-            const player = {
-                name: document.getElementById("name").value,
-                number: Number(document.getElementById("number").value),
-                position: document.getElementById("position").value,
-                team: document.getElementById("team").value,
-                nationality: document.getElementById("nationality").value,
-                height: Number(document.getElementById("height").value),
-                weight: Number(document.getElementById("weight").value)
-            };
+        const response = await fetch("/api/players/" + id);
 
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(player)
-            });
-
-            const data = await response.json();
-            document.getElementById("result").textContent =
-                JSON.stringify(data, null, 2);
+        if (response.ok) {
+            showResult(await response.json());
+        } else {
+            showResult("選手が見つかりません。HTTP " + response.status);
         }
-    );
+    }
 
+    // 選手登録
+    document.getElementById("createForm").addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const player = {
+            name: document.getElementById("createName").value,
+            number: Number(document.getElementById("createNumber").value),
+            position: document.getElementById("createPosition").value,
+            team: document.getElementById("createTeam").value,
+            nationality: document.getElementById("createNationality").value,
+            height: Number(document.getElementById("createHeight").value),
+            weight: Number(document.getElementById("createWeight").value)
+        };
+
+        const response = await fetch("/api/players", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(player)
+        });
+
+        if (response.ok) {
+            showResult(await response.json());
+        } else {
+            showResult("選手登録に失敗しました。HTTP " + response.status);
+        }
+    });
+
+    // 選手更新
     document.getElementById("updateForm").addEventListener("submit", async function (event) {
         event.preventDefault();
 
@@ -150,19 +142,37 @@
             body: JSON.stringify(player)
         });
 
-        const result = document.getElementById("result");
-
         if (response.ok) {
-            const data = await response.json();
-            result.textContent = "選手を更新しました\n" + JSON.stringify(data, null, 2);
+            showResult(await response.json());
         } else if (response.status === 404) {
-            result.textContent = "指定したIDの選手が見つかりません";
+            showResult("更新する選手が見つかりません。");
         } else {
-            result.textContent = "更新に失敗しました：" + response.status;
+            showResult("選手更新に失敗しました。HTTP " + response.status);
         }
     });
 
-</script>
+    // 選手削除
+    document.getElementById("deleteForm").addEventListener("submit", async function (event) {
+        event.preventDefault();
 
+        const id = document.getElementById("deleteId").value;
+
+        if (!confirm("ID " + id + " の選手を削除しますか？")) {
+            return;
+        }
+
+        const response = await fetch("/api/players/" + id, {
+            method: "DELETE"
+        });
+
+        if (response.status === 204) {
+            showResult("選手を削除しました。ID：" + id);
+        } else if (response.status === 404) {
+            showResult("削除する選手が見つかりません。");
+        } else {
+            showResult("選手削除に失敗しました。HTTP " + response.status);
+        }
+    });
+</script>
 </body>
 </html>
