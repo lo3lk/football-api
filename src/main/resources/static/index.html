@@ -516,6 +516,38 @@
             padding: 24px;
         }
 
+        /* 選手詳細画面の大きな画像 */
+        .detail-player-photo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px 24px 0;
+        }
+
+        .detail-player-photo img {
+            width: 220px;
+            height: 220px;
+            max-width: 100%;
+            object-fit: cover;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #0c1627;
+        }
+
+        .detail-player-photo-placeholder {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 220px;
+            height: 220px;
+            max-width: 100%;
+            color: var(--muted);
+            background: #0c1627;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-align: center;
+        }
+
         .detail-item {
             padding: 15px;
             background: #0c1627;
@@ -866,6 +898,7 @@
         </div>
         <button class="close-btn" type="button" onclick="detailDialog.close()" aria-label="閉じる">×</button>
     </div>
+    <div class="detail-player-photo" id="detailPlayerPhoto"></div>
     <div class="detail-grid" id="detailContent"></div>
     <div class="modal-footer">
         <button class="secondary-btn" type="button" onclick="detailDialog.close()">閉じる</button>
@@ -1094,6 +1127,33 @@
 
         try {
             const player = await requestApi("/api/players/" + id);
+
+            // 選手画像を表示
+            const detailPhoto = document.getElementById("detailPlayerPhoto");
+
+            if (player.imagePath) {
+                const imagePath = escapeHtml(player.imagePath);
+                const playerName = escapeHtml(player.name);
+
+                detailPhoto.innerHTML = `
+                    <img
+                        src="${imagePath}"
+                        alt="${playerName}"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                    >
+                    <div class="detail-player-photo-placeholder"
+                         style="display: none;">
+                        画像を表示できません
+                    </div>
+                `;
+            } else {
+                detailPhoto.innerHTML = `
+                    <div class="detail-player-photo-placeholder">
+                        画像未登録
+                    </div>
+                `;
+            }
+
             fillPlayerForm(player);
 
             document.getElementById("formTitle").textContent = "選手情報を編集";
