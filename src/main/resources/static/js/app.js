@@ -56,8 +56,10 @@
             }
         } catch (error) {
             showStatus("選手一覧の取得に失敗しました。 " + error.message, "error");
+            document.getElementById("playerCount").textContent = "一覧を読み込めませんでした";
+            document.getElementById("clearSearch").hidden = true;
             document.getElementById("playerTableBody").innerHTML =
-                '<tr><td colspan="8" class="empty">データを取得できませんでした。サーバーの状態を確認してください。</td></tr>';
+                '<tr><td colspan="8" class="empty"><strong>選手一覧を読み込めませんでした</strong><span>サーバーの状態を確認して、ページを再読み込みしてください。</span></td></tr>';
         }
     }
 
@@ -96,10 +98,13 @@
         const tbody = document.getElementById("playerTableBody");
 
         if (filteredPlayers.length === 0) {
+            updatePlayerCount(0, keyword);
             tbody.innerHTML =
-                '<tr><td colspan="8" class="empty">該当する選手がいません。</td></tr>';
+                '<tr><td colspan="8" class="empty"><strong>該当する選手がいません</strong><span>検索条件を変更するか、条件を解除してください。</span></td></tr>';
             return;
         }
+
+        updatePlayerCount(filteredPlayers.length, keyword);
 
         tbody.innerHTML = filteredPlayers.map(function (player) {
             const id = Number(player.id);
@@ -119,9 +124,7 @@
             <tr>
                 <td class="player-photo-cell">
                     <div class="player-photo-area">
-                        <div>
-                            ${photo}
-                        </div>
+                        ${photo}
                         <div class="player-photo-actions">
                             <input
                                 class="image-upload-input"
@@ -136,7 +139,7 @@
                                 id="imageButton-${id}"
                                 onclick="document.getElementById('imageFile-${id}').click()"
                             >
-                                ${imagePath ? "画像を変更" : "画像を追加"}
+                                ${imagePath ? "画像変更" : "画像追加"}
                             </button>
                         </div>
                     </div>
@@ -155,9 +158,9 @@
                     <span class="position-badge">${escapeHtml(player.position)}</span>
                 </td>
 
-                <td>${escapeHtml(player.team)}</td>
+                <td><span class="cell-primary">${escapeHtml(player.team)}</span></td>
                 <td>${escapeHtml(player.nationality)}</td>
-                <td>${escapeHtml(player.height)} cm / ${escapeHtml(player.weight)} kg</td>
+                <td class="physical-cell"><span>${escapeHtml(player.height)} cm</span><span>${escapeHtml(player.weight)} kg</span></td>
 
                 <td>
                     <div class="actions">
@@ -172,6 +175,15 @@
             </tr>
         `;
         }).join("");
+    }
+
+    function updatePlayerCount(count, keyword) {
+        const countElement = document.getElementById("playerCount");
+        const total = players.length;
+        countElement.textContent = keyword
+            ? `${total}名中 ${count}名を表示`
+            : `${count}名を表示`;
+        document.getElementById("clearSearch").hidden = !keyword;
     }
 
 
@@ -486,9 +498,9 @@
                 });
 
                 currentButton.textContent =
-                    player && player.imagePath
-                        ? "画像を変更"
-                        : "画像を追加";
+                        player && player.imagePath
+                        ? "画像変更"
+                        : "画像追加";
             }
 
             const currentInput =
@@ -507,6 +519,11 @@
     }
 
     document.getElementById("searchInput").addEventListener("input", renderPlayers);
+    document.getElementById("clearSearch").addEventListener("click", function () {
+        document.getElementById("searchInput").value = "";
+        renderPlayers();
+        document.getElementById("searchInput").focus();
+    });
 
     // 画面を開いたら選手一覧を自動取得
     findAllPlayers();
